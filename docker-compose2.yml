@@ -1,9 +1,8 @@
-on: '2.1'
+version: '2.1'
 services:
 
   zookeeper:
     image: debezium/zookeeper:latest
-    container_name: zookeeper
 #    mem_limit: 1073741824
     restart: unless-stopped
     healthcheck:
@@ -18,7 +17,6 @@ services:
 
   kafka:
     image: debezium/kafka:latest
-    container_name: kafka
 #    mem_limit: 1073741824
     restart: unless-stopped
     healthcheck:
@@ -34,7 +32,6 @@ services:
 
   mysqldb:
     image: debezium/example-mysql:latest
-    container_name: mysql
     mem_limit: 1073741824
     restart: unless-stopped
     healthcheck:
@@ -51,7 +48,6 @@ services:
 
   connect:
     image: debezium/connect:latest
-    container_name: connect
 #    mem_limit: 107`3741824
     restart: unless-stopped
 #    healthcheck:
