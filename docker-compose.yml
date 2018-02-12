@@ -3,7 +3,6 @@ services:
 
   zookeeper:
     image: debezium/zookeeper:latest
-#    mem_limit: 1073741824
     restart: unless-stopped
     healthcheck:
       test: echo stat | nc localhost 2181
@@ -17,7 +16,6 @@ services:
 
   kafka:
     image: debezium/kafka:latest
-#    mem_limit: 1073741824
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "bash", "-c", "unset" , "JMX_PORT" ,";" ,"kafka-topics.sh","--zookeeper","zookeeper:2181","--list"]
@@ -28,7 +26,7 @@ services:
       - "9092:9092/tcp"
     depends_on:
       zookeeper:
-        condition: service_healthy
+        condition: service_started
 
   mysqldb:
     image: debezium/example-mysql:latest
@@ -48,13 +46,13 @@ services:
 
   connect:
     image: debezium/connect:latest
-#    mem_limit: 107`3741824
+    command: sh ./setup_connect.sh
     restart: unless-stopped
-#    healthcheck:
-#      test: ["CMD", "mysqladmin", "ping", "-hmysqldb", "-uroot", "-ppassword", "--silent"]
-#      interval: 5s
-#      timeout: 3s
-#      retries: 5
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-hmysqldb", "-uroot", "-ppassword", "--silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     ports:
       - "8083:8083"
     environment:
