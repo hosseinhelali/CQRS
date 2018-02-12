@@ -24,9 +24,8 @@ services:
       retries: 5
     ports:
       - "9092:9092/tcp"
-    depends_on:
-      zookeeper:
-        condition: service_started
+    links:
+     - zookeeper
 
   mysqldb:
     image: debezium/example-mysql:latest
@@ -59,7 +58,7 @@ services:
       GROUP_ID: 1
       CONFIG_STORAGE_TOPIC: my_connect_configs
       OFFSET_STORAGE_TOPIC: my_connect_offsets
-      depends_on:
+      links:
          -mysqldb
          -kafka
          -zookeeper
