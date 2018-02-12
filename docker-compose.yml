@@ -1,8 +1,9 @@
-version: '2.1'
+on: '2.1'
 services:
 
   zookeeper:
     image: debezium/zookeeper:latest
+    container_name: zookeeper
 #    mem_limit: 1073741824
     restart: unless-stopped
     healthcheck:
@@ -17,10 +18,11 @@ services:
 
   kafka:
     image: debezium/kafka:latest
+    container_name: kafka
 #    mem_limit: 1073741824
     restart: unless-stopped
     healthcheck:
-      test: ps augwwx | egrep [S]upportedKafka
+      test: ["CMD", "bash", "-c", "unset" , "JMX_PORT" ,";" ,"kafka-topics.sh","--zookeeper","zookeeper:2181","--list"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -32,6 +34,7 @@ services:
 
   mysqldb:
     image: debezium/example-mysql:latest
+    container_name: mysql
     mem_limit: 1073741824
     restart: unless-stopped
     healthcheck:
@@ -48,7 +51,8 @@ services:
 
   connect:
     image: debezium/connect:latest
-#    mem_limit: 1073741824
+    container_name: connect
+#    mem_limit: 107`3741824
     restart: unless-stopped
 #    healthcheck:
 #      test: ["CMD", "mysqladmin", "ping", "-hmysqldb", "-uroot", "-ppassword", "--silent"]
@@ -56,16 +60,13 @@ services:
 #      timeout: 3s
 #      retries: 5
     ports:
-      - "8083:8083/http"
+      - "8083:8083"
     environment:
       GROUP_ID: 1
       CONFIG_STORAGE_TOPIC: my_connect_configs
       OFFSET_STORAGE_TOPIC: my_connect_offsets
       depends_on:
-         mysqldb:
-            condition: service_healthy
-         kafka:
-            condition: service_healthy
-         zookeeper:
-            condition: service_healthy
+         -mysqldb
+         -kafka
+         -zookeeper
 
