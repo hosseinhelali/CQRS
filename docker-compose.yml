@@ -23,13 +23,10 @@ services:
      - MYSQL_ROOT_PASSWORD=debezium
      - MYSQL_USER=mysqluser
      - MYSQL_PASSWORD=mysqlpw
-  connect:
-    image: debezium/connect-jdbc-es:latest
-    build:
-      context: debezium-jdbc-es
+connect:
+    image: debezium/connect:latest
     ports:
      - 8083:8083
-     - 5005:5005
     links:
      - kafka
      - mysql
