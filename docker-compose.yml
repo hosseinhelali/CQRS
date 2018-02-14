@@ -6,6 +6,10 @@ services:
      - 2181:2181
      - 2888:2888
      - 3888:3888
+    volumes:
+      - 'zookeeper_data:/data'
+      - 'zookeeper_config:/config'
+      - 'zookeeper_logs:/logs'
   kafka:
     image: debezium/kafka:latest
     ports:
@@ -22,12 +26,14 @@ services:
     image: debezium/example-mysql:latest
     ports:
      - 3306:3306
+    volumes:
+      - 'mysql_data:/var/lib/mysql'
     environment:
      - MYSQL_ROOT_PASSWORD=debezium
      - MYSQL_USER=mysqluser
      - MYSQL_PASSWORD=mysqlpw
   connect:
-    image: ddebezium/connect:latest
+    image: debezium/connect:latest
     ports:
      - 8083:8083
      - 5005:5005
@@ -40,7 +46,45 @@ services:
      - GROUP_ID=1
      - CONFIG_STORAGE_TOPIC=my_connect_configs
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
- volumes:
+
+  kafka-jmx-exporter:
+      build: ./prometheus-jmx-exporter
+      ports:
+        - "8080:8080"
+      links:
+        - kafka
+      environment:
+        - JMX_PORT=9999
+        - JMX_HOST=kafka
+        - HTTP_PORT=8080
+        - JMX_EXPORTER_CONFIG_FILE=kafka.yml
+  prometheus:
+      ports:
+        - 9090:9090/tcp
+      image: prom/prometheus:latest
+      volumes:
+        - ./mount/prometheus:/etc/prometheus
+      links:
+        - kafka-jmx-exporter
+  grafana:
+      image: grafana/grafana:latest
+      ports:
+        - 3000:3000/tcp
+      links:
+        - prometheus
+      volumes:
+        - "graf-db:/var/lib/grafana"
+  graf-db:
+      command:
+        - cat
+      image: infinityworks/graf-db:08
+      links:
+        - prometheus
+      volumes:
+        - "graf-db:/var/lib/grafana/"
+volumes:
     kafka_data:
     kafka_config:
     kafka_logs:
+    mysql_data:
+    graf-db:
