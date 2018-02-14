@@ -44,4 +44,3 @@ services:
     kafka_data:
     kafka_config:
     kafka_logs:
-
