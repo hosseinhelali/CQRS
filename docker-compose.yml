@@ -42,14 +42,6 @@ services:
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
  volumes:
     kafka_data:
-        driver: host
-        driver_opts:
-            source: /tmp/kafka/data
     kafka_config:
-        driver: host
-        driver_opts:
-            source: /tmp/kafka/config
     kafka_logs:
-        driver: host
-        driver_opts:
-            source: /tmp/kafka/logs
+
